@@ -1,3 +1,4 @@
+#https://github.com/VlaD0sBanD0s/zone_.git
 from pygame import *
 from random import *
 from time import time as timer
@@ -7,10 +8,10 @@ win_height = 500
 window = display.set_mode((win_width,win_height))
 display.set_caption('Zone Hunter')                   
 
-background = transform.scale(image.load('galaxy.jpg'), (win_width,win_height))  
+background = transform.scale(image.load('FON_ST.jpg'), (win_width,win_height))  
 
 font.init()
-
+#Ссылка сверху.
 
            
 
@@ -82,3 +83,9 @@ while RUN_GAME:                     #!!!ГЕЙМПЛЕЙ!!!
                 if Maslins_Magazine >= 7 and COULDOWN == False:
                     last_time = timer()
                     COULDOWN = True
+    if WIN_GAME != True:
+        window.blit(background,(0,0))
+
+
+    display.update()
+    clock.tick(FPS)
