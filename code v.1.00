@@ -8,11 +8,11 @@ win_height = 500
 window = display.set_mode((win_width,win_height))
 display.set_caption('Zone Hunter')                   
 
-background = transform.scale(image.load('FON_ST.jpg'), (win_width,win_height))  
+background = transform.scale(image.load('CHERNOBYL.jpg'), (win_width,win_height))  
 
 font.init()
 #Ссылка сверху.
-
+#Создано при официальной поддержке GSC Game World.Спасибо за некоторые продукты из серии игр S.T.A.L.K.E.R.!
            
 
 class GameSprite(sprite.Sprite):        #Отец
@@ -36,20 +36,18 @@ class Player(GameSprite):       #TODO Сына
             self.rect.x += self.speed
 
     def FIRE(self):
-        maslina = Maslina('bullet.png',self.rect.centerx,self.rect.top,-17,45,55)
+        maslina = Maslina('MASLINKA.png',self.rect.centerx,self.rect.top,-17,35,45)
         maslinas.add(maslina)
         
-lost = 0
 killy = 0
-
+ammos = 30
 class Enemy(GameSprite):                    #?Внук  
     def update(self):
         self.rect.y += self.speed
-        global lost
         if self.rect.y >= 470:
             self.rect.y = 5
             self.rect.x = randint(50,640)
-            lost = lost + 1
+            
 
 class Maslina(GameSprite):                      #!Главное чтобы не поймать маслину!
     def update(self):
@@ -57,11 +55,32 @@ class Maslina(GameSprite):                      #!Главное чтобы не
         if self.rect.y <= 0:
             self.kill()
 
+IGROK = Player('IGROK.png',200, 424, 6,80,85)             #Внимание, спавн игрока ТУТ <-----
+Stalker_Ploti = sprite.Group()
+Stalker_Snorki = sprite.Group()
+
+font1 = font.SysFont('Arial', 58)
+font2 = font.SysFont('Arial', 32)
+
+for i in range(4):
+    Stalker_Plot =  Enemy('Stalker_Ploti.png',randint(50,640), 100, 1.6,85,85)          #!А это претенденты на потребление боезапаса
+    Stalker_Ploti.add(Stalker_Plot)
+
+for i in range(2):
+    Stalker_Snork =  Enemy('Stalker_snork1.png',randint(50,640), 100, 2.4,85,85)          #!А это претенденты на потребление боезапаса
+    Stalker_Snorki.add(Stalker_Snork)
+
+maslinas = sprite.Group()
+
 clock = time.Clock()
 FPS = 60
 
+LOSE = font1.render('СИГНАЛ ПОТЕРЯН!',True,(255,5,15))            # todo НАДПИСИ РЕЗ-ТА ИГРЫЫЫ!!1
+
 RUN_GAME = True
 WIN_GAME = False
+
+LIVE = 10
 
 
 COULDOWN = False
@@ -76,15 +95,86 @@ while RUN_GAME:                     #!!!ГЕЙМПЛЕЙ!!!
         if e.type == KEYDOWN:               
             if e.key == K_SPACE:
                 
-                if Maslins_Magazine < 7 and COULDOWN == False:
+                if Maslins_Magazine < 30 and COULDOWN == False:
                     Maslins_Magazine += 1
-                    player.FIRE()
-                    RATATA.play()
-                if Maslins_Magazine >= 7 and COULDOWN == False:
+                    ammos -= 1
+                    IGROK.FIRE()
+                    #RATATA.play()
+                if Maslins_Magazine >= 30 and COULDOWN == False:
                     last_time = timer()
                     COULDOWN = True
     if WIN_GAME != True:
+        IGROK.update()
+
+
         window.blit(background,(0,0))
+
+        IGROK.reset()
+
+        Stalker_Ploti.update()                #Отрисовка всего
+        Stalker_Ploti.draw(window)
+
+        Stalker_Snorki.update()                
+        Stalker_Snorki.draw(window)
+
+        maslinas.update()
+        maslinas.draw(window)
+
+        masliny_poimal1 = sprite.groupcollide(maslinas,Stalker_Ploti, True, True)
+        masliny_poimal2 = sprite.groupcollide(maslinas,Stalker_Snorki, True, True)
+
+        for STALKER in masliny_poimal1:                                        #todo Процесс уничтожения противника!
+            killy = killy + 1
+            Stalker_Plot =  Enemy('Stalker_Ploti.png',randint(50,640), 100, 1.6,85,85)
+            Stalker_Ploti.add(Stalker_Plot)
+
+        for STALKER in masliny_poimal2:                                        #todo Процесс уничтожения противника!
+            killy = killy + 1
+            Stalker_Snork =  Enemy('Stalker_snork1.png',randint(50,640), 100, 2.4,85,85)
+            Stalker_Snorki.add(Stalker_Snork)
+
+
+        
+        if sprite.spritecollide(IGROK,Stalker_Ploti, False):             #!Искусство проигрывать!)0)
+            LIVE -= 1
+            sprite.spritecollide(IGROK, Stalker_Ploti, True)
+            Stalker_Plot =  Enemy('Stalker_Ploti.png',randint(50,640), 100, 1.6,85,85)
+            Stalker_Ploti.add(Stalker_Plot)
+            
+
+        if sprite.spritecollide(IGROK,Stalker_Snorki, False):             #?Искусство проигрывать!)0)
+            LIVE -= 1
+            sprite.spritecollide(IGROK, Stalker_Snorki, True)
+            Stalker_Snork =  Enemy('Stalker_snork1.png',randint(50,640), 100, 2.4,85,85)
+            Stalker_Snorki.add(Stalker_Snork)
+
+
+        if LIVE <= 0:
+            WIN_GAME = True                                     #todo Ну бывает....
+            window.blit(LOSE, (155,235))
+            
+        if COULDOWN == True:
+            now_time = timer()
+
+            if now_time - last_time < 1.8:
+                AK_reload = font2.render('ПЕРЕЗАРЯЖАЮСЬ!',1, (255,0,255))
+                window.blit(AK_reload,(255,455))
+            else:
+                Maslins_Magazine = 0
+                ammos = 30
+                COULDOWN = False
+
+        text_kill = font2.render('УБИТО:'+ str(killy),1, (0,255,0))
+        text_LIVE = font2.render('ЖИЗНИ:'+ str(LIVE),1, (0,255,0))
+        text_AK = font2.render('ОРУЖИЕ: КАЛАШ',1, (220,115,180))
+        text_Ammo = font2.render('ПАТРОНЫ: '+ str(ammos),1, (255,5,0))
+
+
+
+        window.blit(text_kill,(15,90))
+        window.blit(text_LIVE,(15,125))
+        window.blit(text_AK,(15,160))
+        window.blit(text_Ammo,(15,195))
 
 
     display.update()
