@@ -36,7 +36,7 @@ class Player(GameSprite):       #TODO Сына
             self.rect.x += self.speed
 
     def FIRE(self):
-        maslina = Maslina('MASLINKA.png',self.rect.centerx,self.rect.top,-17,35,45)
+        maslina = Maslina('MASLINA.png',self.rect.centerx,self.rect.top,-17,35,45)
         maslinas.add(maslina)
         
 killy = 0
@@ -58,6 +58,8 @@ class Maslina(GameSprite):                      #!Главное чтобы не
 IGROK = Player('IGROK.png',200, 424, 6,80,85)             #Внимание, спавн игрока ТУТ <-----
 Stalker_Ploti = sprite.Group()
 Stalker_Snorki = sprite.Group()
+Stalker_Gigants = sprite.Group()
+Stalker_Burers = sprite.Group()
 
 font1 = font.SysFont('Arial', 58)
 font2 = font.SysFont('Arial', 32)
@@ -69,6 +71,14 @@ for i in range(4):
 for i in range(2):
     Stalker_Snork =  Enemy('Stalker_snork1.png',randint(50,640), 100, 2.4,85,85)          #!А это претенденты на потребление боезапаса
     Stalker_Snorki.add(Stalker_Snork)
+
+for i in range(1):
+    Stalker_Gigant =  Enemy('GIGANT.jpg',randint(50,640), 100, 2.4,85,85)          #!А это претенденты на потребление боезапаса
+    Stalker_Gigants.add(Stalker_Gigant)
+
+for i in range(1):
+    Stalker_Burer =  Enemy('BURER.png',randint(50,640), 100, 2.4,85,85)          #!А это претенденты на потребление боезапаса
+    Stalker_Burers.add(Stalker_Burer)
 
 maslinas = sprite.Group()
 
@@ -117,11 +127,20 @@ while RUN_GAME:                     #!!!ГЕЙМПЛЕЙ!!!
         Stalker_Snorki.update()                
         Stalker_Snorki.draw(window)
 
+        Stalker_Gigants.update()
+        Stalker_Gigants.draw(window)
+
+        Stalker_Burers.update()
+        Stalker_Burers.draw(window)
+
         maslinas.update()
         maslinas.draw(window)
 
         masliny_poimal1 = sprite.groupcollide(maslinas,Stalker_Ploti, True, True)
         masliny_poimal2 = sprite.groupcollide(maslinas,Stalker_Snorki, True, True)
+        masliny_poimal3 = sprite.groupcollide(maslinas,Stalker_Gigants, True, True)
+        masliny_poimal4 = sprite.groupcollide(maslinas,Stalker_Burers, True, True)
+
 
         for STALKER in masliny_poimal1:                                        #todo Процесс уничтожения противника!
             killy = killy + 1
@@ -133,6 +152,16 @@ while RUN_GAME:                     #!!!ГЕЙМПЛЕЙ!!!
             Stalker_Snork =  Enemy('Stalker_snork1.png',randint(50,640), 100, 2.4,85,85)
             Stalker_Snorki.add(Stalker_Snork)
 
+        for STALKER in masliny_poimal3:                                        #todo Процесс уничтожения противника!
+            killy = killy + 1
+            Stalker_Gigant =  Enemy('GIGANT.jpg',randint(50,640), 100, 2.4,85,85)          #!А это претенденты на потребление боезапаса
+            Stalker_Gigants.add(Stalker_Gigant)
+
+        for STALKER in masliny_poimal4:                                        #todo Процесс уничтожения противника!
+            killy = killy + 1
+            Stalker_Burer =  Enemy('BURER.png',randint(50,640), 100, 2.4,85,85)          #!А это претенденты на потребление боезапаса
+            Stalker_Burers.add(Stalker_Burer)
+
 
         
         if sprite.spritecollide(IGROK,Stalker_Ploti, False):             #!Искусство проигрывать!)0)
@@ -142,6 +171,18 @@ while RUN_GAME:                     #!!!ГЕЙМПЛЕЙ!!!
             Stalker_Ploti.add(Stalker_Plot)
             
 
+        if sprite.spritecollide(IGROK,Stalker_Burers, False):             #?Искусство проигрывать!)0)
+            LIVE -= 1
+            sprite.spritecollide(IGROK, Stalker_Burers, True)
+            Stalker_Burer =  Enemy('BURER.png',randint(50,640), 100, 2.4,85,85)
+            Stalker_Burers.add(Stalker_Burer)
+
+        if sprite.spritecollide(IGROK,Stalker_Gigants, False):             #?Искусство проигрывать!)0)
+            LIVE -= 3
+            sprite.spritecollide(IGROK, Stalker_Gigants, True)
+            Stalker_Gigant =  Enemy('GIGANT.jpg',randint(50,640), 100, 2.4,85,85)
+            Stalker_Gigants.add(Stalker_Gigant)
+            
         if sprite.spritecollide(IGROK,Stalker_Snorki, False):             #?Искусство проигрывать!)0)
             LIVE -= 1
             sprite.spritecollide(IGROK, Stalker_Snorki, True)
@@ -176,6 +217,9 @@ while RUN_GAME:                     #!!!ГЕЙМПЛЕЙ!!!
         window.blit(text_AK,(15,160))
         window.blit(text_Ammo,(15,195))
 
+
+    display.update()
+    clock.tick(FPS)
 
     display.update()
     clock.tick(FPS)
